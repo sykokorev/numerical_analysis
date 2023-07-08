@@ -1,11 +1,23 @@
 from __future__ import annotations
 
-from typing import Any
 import numpy as np
 import matplotlib.pyplot as plt
+import math
+import random
 
+
+from typing import Any
 from dataclasses import dataclass
 from abc import ABCMeta, abstractmethod
+
+
+COLORS = [
+    'b', 'g', 'r', 'c', 'm', 'y', 'k'
+]
+MARKERS = [
+    '8', '>', '<', '^', 'v', 's',
+    'd', 'D', 'H', 'h', '*', 'p'
+]
 
 
 class Function(metaclass=ABCMeta):
@@ -24,6 +36,10 @@ class Function(metaclass=ABCMeta):
 
 @dataclass
 class Polynomial(Function):
+    '''
+        coefficients: list [a0, a1, a2, ... , an]
+        y = a0 + a1 * x + a2 * x ** 2 + a3 * x ** 3 + ... + an * x ** n
+    '''
     coeficients: list
 
     @property
@@ -43,6 +59,9 @@ class Polynomial(Function):
 
 @dataclass
 class Exponential(Function):
+    '''
+        y = a * x ** degree
+    '''
     degree: float
     a: float
 
@@ -80,8 +99,65 @@ def taylor_series(f: function, x: float, x0: float, n: int):
     return (differential(f, x0, n) * (x - x0) ** n) / fact(n) + taylor_series(f, x, x0, n - 1)
 
 
+def max_error(f: Function, x: float, x0: float, n: int) -> list:
+
+    return (max(
+        [abs(differential(f, x, n + 1)), 
+         abs(differential(f, x0, n + 1))]) * (x - x0) ** (n + 1)) / fact(n + 1)
+
+
 if __name__ == "__main__":
 
-    func = Exponential(0.5, 1)
+    # func = Exponential(0.5, 1)
+    # n = np.linspace(1, 50, 50)
     
-    print(taylor_series(func, 5, 4, 1))
+    # errors = []
+    # y = []
+    # x0 = 8
+    # x1 = 5
+
+    # for i in n:
+    #     y5 = taylor_series(func, x1, x0, i)
+    #     y.append(y5)
+    #     errors.append(max_error(func, x1, x0, i))
+
+    # fig, axs = plt.subplots(2, 1)
+    # axs[0].plot(n, y, linestyle='-', marker='*', color='red')
+    # axs[0].set_title('Function approxiamtion')
+    # axs[1].plot(n, errors, linestyle='-', marker='o', color='blue')
+    # axs[1].set_title('Residuals')
+    # axs[0].grid(True)
+    # axs[1].grid(True)
+
+    # plt.show()
+
+    poly = Polynomial([1.2, -0.25, -0.5, -0.15, -0.1])
+
+    fig, ax = plt.subplots()
+
+    x = np.linspace(-2, 2, 21)
+    x0 = 0
+    n = np.linspace(0, 4, 5)
+    y = []
+
+    for xi in x:
+        y.append(poly(xi))
+    ax.plot(x, y, label='exact', color='k', marker='o')
+
+    for i in n:
+        y = []
+        for xi in x:
+            y.append(taylor_series(poly, xi, x0, i))
+        color = random.randint(0, len(COLORS)-1)
+        marker = random.randint(0, len(MARKERS) - 1)
+        ax.plot(
+            x, y, color=COLORS[color], 
+            marker=MARKERS[marker], label=f'{int(i)}th order'
+        )
+        ax
+
+    ax.grid()
+    ax.set_xlabel('x')
+    ax.set_ylabel('Approximation to f(x) = -0.1$x^4$ - 0.15$x^3$ - 0.5$x^2$ - 0.25x + 1.2')
+    fig.legend()
+    plt.show()    
