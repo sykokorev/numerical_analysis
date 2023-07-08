@@ -108,29 +108,32 @@ def max_error(f: Function, x: float, x0: float, n: int) -> list:
 
 if __name__ == "__main__":
 
-    # func = Exponential(0.5, 1)
-    # n = np.linspace(1, 50, 50)
+    # Exponantial function. Errors analysis.
+    func = Exponential(0.5, 1)
+    n = np.linspace(1, 50, 50)
     
-    # errors = []
-    # y = []
-    # x0 = 8
-    # x1 = 5
+    errors = []
+    y = []
+    x0 = 8
+    x1 = 5
 
-    # for i in n:
-    #     y5 = taylor_series(func, x1, x0, i)
-    #     y.append(y5)
-    #     errors.append(max_error(func, x1, x0, i))
+    for i in n:
+        y5 = taylor_series(func, x1, x0, i)
+        y.append(y5)
+        errors.append(max_error(func, x1, x0, i))
 
-    # fig, axs = plt.subplots(2, 1)
-    # axs[0].plot(n, y, linestyle='-', marker='*', color='red')
-    # axs[0].set_title('Function approxiamtion')
-    # axs[1].plot(n, errors, linestyle='-', marker='o', color='blue')
-    # axs[1].set_title('Residuals')
-    # axs[0].grid(True)
-    # axs[1].grid(True)
+    fig, axs = plt.subplots(2, 1)
+    axs[0].plot(n, y, linestyle='-', marker='*', color='red')
+    axs[0].set_title('Function approxiamtion')
+    axs[1].plot(n, errors, linestyle='-', marker='o', color='blue')
+    axs[1].set_title('Residuals')
+    axs[0].grid(True)
+    axs[1].grid(True)
 
-    # plt.show()
+    plt.show()
 
+
+    # Polynomial function. Approximation analysis
     poly = Polynomial([1.2, -0.25, -0.5, -0.15, -0.1])
 
     fig, ax = plt.subplots()
