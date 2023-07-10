@@ -4,6 +4,7 @@ import os
 import sys
 import math
 
+from copy import deepcopy
 from dataclasses import dataclass
 from abc import ABCMeta, abstractmethod
 from typing import Any, List
@@ -29,6 +30,24 @@ class Function(metaclass=ABCMeta):
     def differential(self, x: float) -> float:
         pass
 
+    def  __add__(self, f: Function) -> Addition:
+        return Addition([self, f])
+    
+    def __radd__(self, f: Function) -> Addition:
+        return Addition([self, f])
+    
+    def __iadd__(self, f: Function) -> Addition:
+        return Addition([self, f])
+    
+    def __mul__(self, f: Function) -> Product:
+        return Product([self, f])
+    
+    def __rmul__(self, f) -> Product:
+        return Product([self, f])
+    
+    def __imul__(self, f) -> Product:
+        return Product([self, f])
+
 
 @dataclass
 class Addition:
@@ -48,6 +67,30 @@ class Addition:
         for f in self.func[1:]:
             s += ' + ' + str(f)
         return s
+
+
+@dataclass
+class Product:
+    func: List[Function]
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        res = 1.0
+        for f in self.func:
+            res *= f(args[0])
+        return res
+
+    def __str__(self):
+        s = 'f(x) = ' + str(self.func[0])
+        for f in self.func[1:]:
+            s += ' * ' + str(f)
+        return s
+    
+    def derivative(self):
+        tmp = []
+        # for i, f in enumerate(self.func):
+        #     tmp.append([f.derivative(), self.func[j] for j in range(len(self.func)-1) if j != i])
+        # print(tmp)
+
 
 @dataclass
 class Polynomial(Function):
@@ -98,44 +141,54 @@ class Exponential(Function):
         return exp(x)
 
     def __str__(self):
-        return f'{self.a}x^{self.degree}'
+        a = self.a if self.a != 1.0 else ''
+        return f'{a} * x^{self.degree}'
 
 
 @dataclass
 class Sin(Function):
-    coef: float = 1.0
+    '''
+        f(x) = a * sin(b * x)
+    '''
+    a: float = 1.0
+    b: float = 1.0
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-        return math.sin(args[0] * self.coef)
-
-    def __add__(self):
-        return 
+        return self.a * math.sin(args[0] * self.b)
 
     def derivative(self) -> Cos:
-        return Cos(self.coef)
+        return Cos(self.a, self.b)
 
     def differential(self, x: float) -> float:
         c = self.derivative()
         return c(x)
 
     def __str__(self):
-        return f'sin({self.coef}x)'
+        a = self.a if self.a != 1.0 else ''
+        b = self.b if self.b != 1.0 else ''
+        return f'{a}sin({b}x)'
 
 
 @dataclass
 class Cos(Function):
-    coef: float = 1.0
+    '''
+        f(x) = a * cos(b * x)
+    '''    
+    a: float = 1.0
+    b: float = 1.0
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         
-        return math.cos(args[0] * self.coef)
+        return self.a * math.cos(args[0] * self.b)
 
     def derivative(self) -> Sin:
-        return Sin(self.coef)
+        return Sin((-1) * self.a, self.b)
 
     def differential(self, x: float) -> float:
         s = self.derivative()
         return s(x)
 
     def __str__(self):
-        return f'cos({self.coef}x)'
+        a = self.a if self.a != 1.0 else ''
+        b = self.b if self.b != 1.0 else ''
+        return f'{a}cos({b}x)'

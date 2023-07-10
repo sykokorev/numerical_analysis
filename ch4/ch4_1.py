@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-import numpy as np
-import matplotlib.pyplot as plt
-import math
-import random
 import os
 import sys
 
@@ -14,8 +10,6 @@ LIBDIR = os.path.abspath(
 )
 sys.path.append(LIBDIR)
 
-
-from lib.consts import COLORS, MARKERS
 from lib.classes import *
 from lib.functions import bisection
 
