@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import os
 import sys
+import sympy
+
+from sympy.core import mul, Expr
 
 
 LIBDIR = os.path.abspath(
@@ -10,16 +13,13 @@ LIBDIR = os.path.abspath(
 )
 sys.path.append(LIBDIR)
 
-from lib.classes import *
+from lib.symbol import *
 
 
 if __name__ == "__main__":
 
-    cos = Cos(1.0, 5.0)
-    sin = Sin(1.0, 2.0)
-    cos1 = Cos(2.0, 3.0)
+    x = Symbol('x')
+    z = Symbol('z')
 
-    sin *= cos
-    sin *= cos1
-    print(sin)
-    # print()
+    exp = x ** 2
+    print(exp)

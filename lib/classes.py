@@ -40,13 +40,27 @@ class Function(metaclass=ABCMeta):
         return Addition([self, f])
     
     def __mul__(self, f: Function) -> Product:
-        return Product([self, f])
+        if isinstance(f, Product):
+            f = [*f.func]
+        else:
+            f = [f]
+        return Product([self, *f])
     
     def __rmul__(self, f) -> Product:
-        return Product([self, f])
+        if isinstance(f, Product):
+            f = [*f.func]
+        elif isinstance(f, Addition):
+            return Addition([self * fi for fi in f.func ])
+        else:
+            f = [f]
+        return Product([self, *f])
     
     def __imul__(self, f) -> Product:
-        return Product([self, f])
+        if isinstance(f, Product):
+            f = [*f.func]
+        else:
+            f = [f]
+        return Product([self, *f])
 
 
 @dataclass
@@ -63,7 +77,7 @@ class Addition:
         return sum([f.derivative()(args[0]) for f in self.func])
 
     def __str__(self):
-        s = 'f(x) = ' + str(self.func[0])
+        s = str(self.func[0])
         for f in self.func[1:]:
             s += ' + ' + str(f)
         return s
@@ -80,7 +94,7 @@ class Product:
         return res
 
     def __str__(self):
-        s = 'f(x) = ' + str(self.func[0])
+        s = str(self.func[0])
         for f in self.func[1:]:
             s += ' * ' + str(f)
         return s
@@ -146,7 +160,7 @@ class Exponential(Function):
 
 
 @dataclass
-class Sin(Function):
+class sin(Function):
     '''
         f(x) = a * sin(b * x)
     '''
@@ -156,8 +170,8 @@ class Sin(Function):
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return self.a * math.sin(args[0] * self.b)
 
-    def derivative(self) -> Cos:
-        return Cos(self.a, self.b)
+    def derivative(self) -> cos:
+        return cos(self.a, self.b)
 
     def differential(self, x: float) -> float:
         c = self.derivative()
@@ -170,7 +184,7 @@ class Sin(Function):
 
 
 @dataclass
-class Cos(Function):
+class cos(Function):
     '''
         f(x) = a * cos(b * x)
     '''    
@@ -181,8 +195,8 @@ class Cos(Function):
         
         return self.a * math.cos(args[0] * self.b)
 
-    def derivative(self) -> Sin:
-        return Sin((-1) * self.a, self.b)
+    def derivative(self) -> sin:
+        return sin((-1) * self.a, self.b)
 
     def differential(self, x: float) -> float:
         s = self.derivative()

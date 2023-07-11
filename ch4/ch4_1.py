@@ -19,8 +19,8 @@ if __name__ == "__main__":
     a = [-0.6, -0.3, 0.6]
     b = [-0.5, -0.2, 0.7]
     e = 0.0005
-    cos = Cos(2)
-    sin = Sin(5)
+    cos = cos(2)
+    sin = sin(5)
 
     func = Addition([sin, cos])
 
