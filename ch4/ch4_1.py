@@ -10,8 +10,8 @@ LIBDIR = os.path.abspath(
 )
 sys.path.append(LIBDIR)
 
-from lib.classes import *
-from lib.functions import bisection
+from symbols.classes import *
+from functions.functions import bisection
 
 
 if __name__ == "__main__":

@@ -12,9 +12,9 @@ LIBDIR = os.path.abspath(
 sys.path.append(LIBDIR)
 
 
-from lib.consts import COLORS, MARKERS
-from lib.classes import *
-from lib.functions import *
+from consts.consts import COLORS, MARKERS
+from symbols.classes import *
+from functions.functions import *
 
 
 if __name__ == "__main__":

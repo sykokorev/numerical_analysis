@@ -13,7 +13,7 @@ LIBDIR = os.path.abspath(
 )
 sys.path.append(LIBDIR)
 
-from lib.symbol import *
+from symbols.symbol import *
 
 
 if __name__ == "__main__":
