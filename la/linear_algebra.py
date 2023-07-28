@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 def norm(v: list) -> float:
     if not isinstance(v, list):
         raise TypeError('Vector must be list type')    
@@ -102,6 +105,8 @@ def separate(m: list, col_num: int) -> list:
 
 
 def is_square(m) -> bool:
+    if len(m) == 1 and isinstance(m[0], (int, float)):
+        return True
     if not (len(m) == len(m[0])):
         return False
     else:
@@ -124,6 +129,44 @@ def join(m1, m2) -> list:
         out.append(tmp)
 
     return out
+
+
+
+def upper(m):
+
+    rows = len(m)
+    c = deepcopy(m)
+    cols = len(c[0])
+    
+    for k in range(rows):
+        pivot = c[k][k]
+        for i in range(k+1, rows):
+            pivot_col = c[i][k]
+            for j in range(cols):
+                pivot_row = c[k][j]
+                c[i][j] = c[i][j] - pivot_col * pivot_row / c[k][k]
+
+    return c
+
+
+def joint(a, b):
+
+    out = []
+    rows = len(a)
+    for row in range(rows):
+        out.append([ai for ai in a[row]] + [b[row]])
+    
+    return out
+
+
+def split(c: list, col: int = 1):
+    a = []
+    b = []
+    for row in c:
+        a.append(row[:-col])
+        tmp = row[col+2:]
+        b.append(tmp[0] if len(tmp) == 1 else tmp)
+    return (a, b)
 
 
 def find_row_with_max_element(m, col_num: int=0, starting_row: int=0):
@@ -195,3 +238,28 @@ def inverse(m) -> list:
         return False
     else:
         return inverse_matrix
+
+
+def det(m: list, mul=1.0) -> float | bool:
+
+    if not is_square(m):
+        return False
+
+    width = len(m)
+
+    if width == 1:
+        return mul * m[0][0]
+    else:
+        sign = -1
+        answer = 0
+        for col in range(width):
+            mi = []
+            for row in range(1, width):
+                buff = []
+                for k in range(width):
+                    if k != col:
+                        buff.append(m[row][k])
+                mi.append(buff)
+            sign *= -1
+            answer = answer + mul * det(mi, sign * m[0][col])
+    return answer

@@ -1,4 +1,8 @@
+import numpy as np
+
+
 from la.linear_algebra import *
+
 
 
 def print_mat(matrix: list, digits: int = 3):
@@ -16,19 +20,19 @@ if __name__ == "__main__":
     ]
 
     v = [1, 2, 3]
-    print(f'Norm of the vector: {v} = ', end='')
-    print(norm(v))
-    print(f'Norm of the matrix: ')
-    print_mat(matrix)
-    print(norm(matrix))
+    # print(f'Norm of the vector: {v} = ', end='')
+    # print(norm(v))
+    # print(f'Norm of the matrix: ')
+    # print_mat(matrix)   
+    # print(norm(matrix))
 
     transpose_matrix = transpose(matrix)
 
-    print('Initial matrix')
-    print_mat(matrix)
-    print('Transpose matrix')
-    print_mat(transpose_matrix)
-    print()
+    # print('Initial matrix')
+    # print_mat(matrix)
+    # print('Transpose matrix')
+    # print_mat(transpose_matrix)
+    # print()
 
     m1 = [
         [1, 2, 3],
@@ -40,12 +44,12 @@ if __name__ == "__main__":
         [0.4, 0.5, 0.6],
         [0.7, 0.8, 0.9]
     ]
-    print_mat(mat_add(m1, m2))
-    print()
-    print_mat(mat_sub(m1, m2))
-    print()
-    print_mat(scalar_mul(2, m2))
-    print()
+    # print_mat(mat_add(m1, m2))
+    # print()
+    # print_mat(mat_sub(m1, m2))
+    # print()
+    # print_mat(scalar_mul(2, m2))
+    # print()
 
     m1 = [
         [1.0, 4.0],
@@ -66,10 +70,19 @@ if __name__ == "__main__":
     ]
     m5 = inverse(m4)
 
-    print_mat(m4)
+    # print_mat(m4)
+    # print()
+    # print_mat(m5)
+    # print('Check inversed matrix')
+    # print_mat(mat_mul(m5, m4))
+    # print('Check inversed matrix')
+    # print_mat(mat_mul(m4, m5))
+
     print()
-    print_mat(m5)
-    print('Check inversed matrix')
-    print_mat(mat_mul(m5, m4))
-    print('Check inversed matrix')
-    print_mat(mat_mul(m4, m5))
+    matrix = [
+        [3, 2, -3],
+        [7, -1, 0],
+        [2, -4, 5]
+    ]
+    print(det(matrix))
+    print(np.linalg.det(matrix))
