@@ -49,6 +49,22 @@ def dot(m1: list, m2: list) -> float or bool:
 
 def mat_mul(m1: list, m2: list) -> list:
 
+    # Multiply a matrix by a vector
+
+    if isinstance(m1[0], (float, int)) and isinstance(m2[0], list):
+        res = [0.0 for i in range(len(m1))]
+        for i, el in enumerate(m2):
+            res[i] = sum([eli * m1i for eli, m1i in zip(el, m1)])
+        return res
+        
+    if isinstance(m2[0], (float, int)) and isinstance(m1[0], list):
+        res = [0.0 for i in range(len(m2))]
+        for i, el in enumerate(m1):
+            res[i] = sum([eli * m2i for eli, m2i in zip(el, m2)])
+        return res
+
+    # Multiply a matrix by a mtrix
+
     n, m, p, q = len(m1), len(m1[0]), len(m2), len(m2[0])
     if m != p:
         raise ValueError('Number of rows of first matrix mus be equal number of columns second matrix')
@@ -56,24 +72,31 @@ def mat_mul(m1: list, m2: list) -> list:
     res = [[0.0 for i in range(q)] for j in range(n)]
     for i in range(n):
         for j in range(q):
-            sum = 0.0
+            summ = 0.0
             for k in range(p):
-                sum += m1[i][k]  * m2[k][j]
-            res[i][j] = sum
+                summ += m1[i][k]  * m2[k][j]
+            res[i][j] = summ
 
     return res
 
 
 def scalar_mul(m1: list | float, m2: list | float) -> list:
 
-    if isinstance(m1, list) and isinstance(m2, (int, float)):
+    if isinstance(m1, list) and isinstance(m2, (int, float)) and isinstance(m1[0], (float, int)):
+        return [m2 * mi for mi in m1]
+    if isinstance(m2, list) and isinstance(m1, (float, int)) and isinstance(m2[0], (float, int)):
+        return [m1 * mi for mi in m2]
+
+    if isinstance(m1[0], list) and isinstance(m2, (int, float)):
         return [[m2 * mi for mi in m] for m in m1]
-    if isinstance(m2, list) and isinstance(m1, (float, int)):
+    if isinstance(m2[0], list) and isinstance(m1, (float, int)):
         return [[m1 * mi for mi in m] for m in m2]
     return None
 
 
 def mat_add(m1: list, m2: list) -> list:
+    if isinstance(m1[0], (int, float)) and isinstance(m2[0], (int, float)):
+        return [m1i + m2i for m1i, m2i in zip(m1, m2)]
     return list(map(sum, zip(*i)) for i in zip(m1, m2))
 
 
@@ -189,6 +212,10 @@ def identity(ndim: int) -> list:
     return matrix
 
 
+def zeros(ndim: int) -> list:
+    return [[0.0 for i in range(ndim)] for j in range(ndim)]
+
+
 def compare(m1: list, m2: list) -> bool:
     
     if not (len(m1) - len(m2)) or not (len(m1[0]) - len(m2[0])):
@@ -202,7 +229,12 @@ def compare(m1: list, m2: list) -> bool:
     return True
 
 
-def inverse(m) -> list:
+def inverse(m, diag: bool = False) -> list:
+    '''
+        m - Matrix must be square
+        diag - is the m diagonal matrix
+    '''
+
     if not is_square(m):
         return False
 
@@ -213,6 +245,15 @@ def inverse(m) -> list:
     flag = False
     count = 0
     max_count = 100
+
+    if diag:
+        inverse_matrix = deepcopy(m)
+        if all([inverse_matrix[i][i] != 0 for i in range(len(inverse_matrix))]):
+            for i in range(len(inverse_matrix)):
+                inverse_matrix[i][i] = 1 / inverse_matrix[i][i]
+            return inverse_matrix
+        else:
+            raise ZeroDivisionError('All main diagonal elements must be non-zero.')
 
     while not flag and count < max_count:
         for i in range(num_rows + 1):

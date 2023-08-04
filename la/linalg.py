@@ -70,6 +70,13 @@ def gauss_jordan(a, b):
 # LU Decomposition. Return tuple(L, U)
 def lu(a):
 
+    '''
+        |a11  0  ...   0|   | 0  a12 ... a1n|
+        |a21 a22 ...   0|   | 0   0  ... a2n|
+        |...............|   | ............. |
+        |an1 an2 ...   0|   | 0   0  ...  0 |
+    '''
+
     width = len(a)
     upper = deepcopy(a)
     lower = identity(width)
@@ -88,6 +95,10 @@ def lu(a):
 
 
 def solveLU(a, b):
+
+    '''
+        [A]{x} = {b} => [L][U]{x} = {b} => [L]{y} = {b}, {y} = [U]{x}
+    '''
 
     width = len(a)
     l, u = lu(a)
@@ -135,3 +146,54 @@ def cholab(a, b):
         x[i] = (1 / u[i][i]) * (y[i] - sum(u[i][j] * x[j] for j in range(i+1, width)))
     
     return x
+
+
+def jacobi(a: list, b: list, xinit: list = [0.0, 0.0, 0.0], es: float = 10 ** -6, iter: int = 100):
+    '''
+        Instead of solving [A]{x} = {b}, solve {x} = [C] + [M]{x}
+            where [C] = inverse([D]){b}, [M] = inverse([D])[R],
+            where [D] is a matrix [A] with all elements equal zero except of main diagonal elements 
+            [R] is a matrix [A] with all elements of main diagonal equal zero
+    '''
+
+    if iter == 0:
+        raise RecursionError('Maximum iterations exceeded. No solution found.')
+
+    d = identity(len(a))
+    r = deepcopy(a)
+    for i in range(len(d)):
+        d[i][i] = a[i][i]
+        r[i][i] = 0.0
+    
+    d = inverse(d, True)
+    c = mat_mul(d, b)
+    m = mat_mul(d, r)
+
+    x = mat_add(c, scalar_mul((-1), mat_mul(m, xinit)))
+
+    if (er := (distance(x, xinit) / norm(x))) <= es:
+        return x, er
+    else:
+        return jacobi(a, b, x, es, iter-1)
+
+
+def gauss_seidel(a: list, b: list, xinit: list = [0.0, 0.0, 0.0], es: float = 10 ** -6, iter: int = 100):
+
+    '''
+        Instead of solving [A]{x}_(k+1) = {b}, solve [L]{x} = {b} - [U]{x}_(k)
+            where [L] is lower diagonal matrix with elements of matrix [A]
+            and [U] is upper diagonal matrix with elements of matrix [A] uii = 0
+    '''
+    width = len(a)
+    x = [0.0 for i in range(width)]
+
+    for i in range(width):
+        aii = 1 / a[i][i]
+        s1 = sum([a[i][j] * xinit[j] for j in range(i + 1, width)])
+        s2 = sum([a[i][j] * x[j] for j in range(0, i)])
+        x[i] = aii * (b[i] - s1 - s2)
+
+    if (er := (distance(x, xinit) / norm(x))) <= es:
+        return x, er
+    else:
+        return gauss_seidel(a, b, x, es, iter-1)
