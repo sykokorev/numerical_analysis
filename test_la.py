@@ -86,3 +86,18 @@ if __name__ == "__main__":
     ]
     print(det(matrix))
     print(np.linalg.det(matrix))
+
+    # Check is the matrix diagonal dominant
+    a = [
+        [3.0, -2.0, 1.0],
+        [1.0, 3.0, 2.0],
+        [-1.0, 2.0, 4.0]
+    ]
+    b = [
+        [-2.0, 2.0, 1.0],
+        [1.0, 3.0, 2.0],
+        [1.0, -2.0, 0.0]
+    ]
+
+    print(is_diagonal_dominant(a), is_diagonal_dominant(b))
+

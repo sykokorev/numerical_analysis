@@ -82,16 +82,17 @@ def mat_mul(m1: list, m2: list) -> list:
 
 def scalar_mul(m1: list | float, m2: list | float) -> list:
 
-    if isinstance(m1, list) and isinstance(m2, (int, float)) and isinstance(m1[0], (float, int)):
-        return [m2 * mi for mi in m1]
-    if isinstance(m2, list) and isinstance(m1, (float, int)) and isinstance(m2[0], (float, int)):
-        return [m1 * mi for mi in m2]
-
-    if isinstance(m1[0], list) and isinstance(m2, (int, float)):
-        return [[m2 * mi for mi in m] for m in m1]
-    if isinstance(m2[0], list) and isinstance(m1, (float, int)):
-        return [[m1 * mi for mi in m] for m in m2]
-    return None
+    if isinstance(m1, list) and isinstance(m2, (int, float)):
+        if isinstance(m1[0], (float, int)):
+            return [m2 * mi for mi in m1]
+        elif isinstance(m1[0], list):
+            return [scalar_mul(mi, m2) for mi in m1]
+    
+    if isinstance(m2, list) and isinstance(m1, (int, float)):
+        if isinstance(m2[0], (float, int)):
+            return [m1 * mi for mi in m2]
+        elif isinstance(m2[0], list):
+            return [scalar_mul(mi, m1) for mi in m2]
 
 
 def mat_add(m1: list, m2: list) -> list:
@@ -134,6 +135,15 @@ def is_square(m) -> bool:
         return False
     else:
         return True
+
+
+def is_diagonal_dominant(m: list) -> bool:
+
+    n = len(m)
+    r = []
+    for i in range(n):
+        r.append(abs(m[i][i]) >= sum([m[i][j] for j in range(n) if j != i]))
+    return all(r)
 
 
 def swap_row(m: list, i: int, j: int) -> list:
@@ -304,3 +314,4 @@ def det(m: list, mul=1.0) -> float | bool:
             sign *= -1
             answer = answer + mul * det(mi, sign * m[0][col])
     return answer
+

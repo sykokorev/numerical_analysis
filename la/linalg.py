@@ -177,13 +177,18 @@ def jacobi(a: list, b: list, xinit: list = [0.0, 0.0, 0.0], es: float = 10 ** -6
         return jacobi(a, b, x, es, iter-1)
 
 
-def gauss_seidel(a: list, b: list, xinit: list = [0.0, 0.0, 0.0], es: float = 10 ** -6, iter: int = 100):
+def gauss_seidel(a: list, b: list, xinit, es: float = 10 ** -6, iter: int = 100, w: float = 1.0):
 
     '''
         Instead of solving [A]{x}_(k+1) = {b}, solve [L]{x} = {b} - [U]{x}_(k)
             where [L] is lower diagonal matrix with elements of matrix [A]
             and [U] is upper diagonal matrix with elements of matrix [A] uii = 0
+            w is a relaxation factor which is 0 < w < 2
     '''
+
+    if not iter:
+        raise RecursionError('Maximum iteration excceded. No solution found.')
+
     width = len(a)
     x = [0.0 for i in range(width)]
 
@@ -192,8 +197,70 @@ def gauss_seidel(a: list, b: list, xinit: list = [0.0, 0.0, 0.0], es: float = 10
         s1 = sum([a[i][j] * xinit[j] for j in range(i + 1, width)])
         s2 = sum([a[i][j] * x[j] for j in range(0, i)])
         x[i] = aii * (b[i] - s1 - s2)
+        x[i] = xinit[i] + w * (x[i] - xinit[i])
 
     if (er := (distance(x, xinit) / norm(x))) <= es:
+        print(f'Current iteration: {iter}')
         return x, er
     else:
         return gauss_seidel(a, b, x, es, iter-1)
+
+
+# Solving Nonlinear systems of equations
+def fixed_point(fx: list, x0: list, es: float = 10 ** -6, max_it: int = 100, current_it: int = 0):
+
+    '''
+        Solving nonlinear system of equations by using fixed point method
+            fx is a list of funcions fx = [f1(x1, x2, ... xn), f2(x1, x2, ... xn), ..., fn(x1, x2, ... xn)]
+            x0 is an initial guess. len(fx) must be equal len(x0)
+            w is a relacsation factor which is 0 < w < 2
+    '''
+
+    x = [0.0 for i in range(len(fx))]
+    tmp = [xi for xi in x0]
+    if current_it >= max_it:
+        raise RecursionError('Maximum iterations esceeded. No solutions found.')
+
+    for i, fxi in enumerate(fx):
+        x[i] = fxi(tmp)
+        tmp[i] = x[i]
+
+    er = abs(distance(x, x0) / norm(x))
+
+    if er <= es:
+        return x
+    else:
+        return fixed_point(fx, x, es, max_it, current_it + 1)
+
+
+def newton_raphson(fx, j, x0, es = 10 ** -6, max_iter = 100, current_it = 0, w = 1.0):
+
+    '''
+        Newton-Raphson method for solving nonlinear system of equations
+            {f} = 
+                f1(x1, x2, ..., xn) = 0
+                f2(x1, x2, ..., xn) = 0
+                ...
+                fn(x1, x2, ..., xn) = 0
+
+            {x(i+1)} = {x(i)} + {del_x}
+            where {del_x} = -inverse([J]){f}
+                  [J] is a Jacobian of {f} (nxn matrix)
+
+            fx is {f}
+            j is [J]
+            x0 is an initial guess
+            w is a relaxation factor 0.0 < w < 2.0
+    '''
+
+    func = [fxi(x0) for fxi in fx]
+    jac = inverse(j(x0))
+    delx = mat_mul(scalar_mul(-1, jac), func)
+    
+    x = mat_add(x0, scalar_mul(w, delx))
+    er = norm(delx) / norm(x)
+
+    if er <= es:
+        return x
+    else:
+        return newton_raphson(fx, j, x, es, max_iter, current_it - 1, w)
