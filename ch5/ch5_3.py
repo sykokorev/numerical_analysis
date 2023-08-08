@@ -29,12 +29,8 @@ if __name__ == "__main__":
     print(f'Relative error {error}')
 
     # Gauss-Seidel method
-
     x, error = gauss_seidel(a, b, [1.0, 1.0, 1.0], 0.0001)
 
     for i, xi in enumerate(x, 1):
         print(f'x{i} = {round(xi, 4)}', end='\t')
     print(f'Relative error {error}')
-
-    # Gauss-Sedel method with relaxation factor
-    x, error = gauss_seidel(a, b, [1.0, 1.0, 1.0], 0.0001, w=0.1)

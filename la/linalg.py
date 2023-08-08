@@ -200,7 +200,6 @@ def gauss_seidel(a: list, b: list, xinit, es: float = 10 ** -6, iter: int = 100,
         x[i] = xinit[i] + w * (x[i] - xinit[i])
 
     if (er := (distance(x, xinit) / norm(x))) <= es:
-        print(f'Current iteration: {iter}')
         return x, er
     else:
         return gauss_seidel(a, b, x, es, iter-1)
