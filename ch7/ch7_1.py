@@ -1,6 +1,7 @@
 import os
 import sys
 import matplotlib.pyplot as plt
+import numpy as np
 
 DIR = os.path.abspath(os.path.join(
     os.path.dirname(__file__),
@@ -25,11 +26,12 @@ if __name__ == "__main__":
     yp = [yi[1] for yi in points]
 
     a = polyfit(points)
-    x = [i for i in range(0, 5)]
+    print(a)
+    x = np.linspace(0, 5, 1000)
     y = polynomial(a, x)
 
     fig, ax = plt.subplots()
-    ax.scatter(xp, yp, color='r', marker='*')
+    ax.scatter(xp, yp, color='g', marker='o')
     ax.plot(x, y, linestyle='-', marker='', color='k')
 
     ax.grid(True)
