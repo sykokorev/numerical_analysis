@@ -42,6 +42,7 @@ if __name__ == "__main__":
         y1.append(interp(xi)[1])
 
     interp.n = 2
+    
 
     # fig, ax = plt.subplots()
 

@@ -82,7 +82,7 @@ def lu(a):
     lower = identity(width)
 
     for k in range(width):
-        
+       
         pivot = upper[k][k]
         for i in range(k+1, width):
             if k != i:
@@ -94,6 +94,78 @@ def lu(a):
     return (lower, upper)    
 
 
+def pivot_mat(A):
+
+    n = len(A)
+
+    id_mat = identity(n)
+
+    for j in range(n):
+        row = j
+        max_arg = abs(A[j][j])
+        for r in range(j, n):
+            if abs(A[r][j]) >= max_arg:
+                row = r
+
+        if j != row:
+            id_mat[j], id_mat[row] = id_mat[row], id_mat[j]
+        
+    return id_mat
+
+
+# def lup(A):
+
+#     n = len(A)
+#     P = identity(n)
+
+#     for k in range(n):
+
+#         rc, arg = max_element(A, k, k)
+#         # print(k, rc, arg)
+#         A = swap_rows(A, k, rc[0])
+#         A = swap_cols(A, k, rc[1])
+#         P = swap_rows(P, k, rc[0])
+#         P = swap_cols(P, k, rc[1])
+#         pivot = A[k][k]
+#         A[k] = [ai / pivot for ai in A[k]]
+#         for row in range(k + 1, n):
+#             if A[row][k] != 0.0:
+#                 ratio = A[k][k] * A[row][k]
+#                 A[row] = [ai - ak * ratio for ai, ak in zip(A[row], A[k])]
+   
+#     return P, A
+
+
+def lup(A):
+
+    n = len(A)
+
+    L = zeros(n)
+    U = zeros(n)
+    P = pivot_mat(A)
+
+    PA = mat_mul(P, A)
+
+    for i in range(n):
+
+        for k in range(i, n):
+            s1 = 0.0
+            for j in range(i):
+                s1 += L[i][j] * U[j][k]
+            U[i][k] = A[i][k] - s1
+
+        for k in range(i, n):
+            if i == k:
+                L[i][i] == 1.0
+            else:
+                s2 = 0.0
+                for j in range(i):
+                    s2 += L[k][j] * U[j][i]
+                L[k][i] = (A[k][i] - s2) / U[i][i]
+    
+    return (P, L, U)
+
+
 def solveLU(a, b):
 
     '''
@@ -101,6 +173,7 @@ def solveLU(a, b):
     '''
 
     width = len(a)
+
     l, u = lu(a)
     y = [0.0 for i in range(width)]
     x = [0.0 for i in range(width)]

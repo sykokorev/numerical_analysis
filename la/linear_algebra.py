@@ -1,6 +1,45 @@
 from copy import deepcopy
 
 
+# Swap row i and j
+def swap_rows(A, i, j):
+
+    a = deepcopy(A)
+    if i == j: return a
+    tmp = [ai for ai in a[j]]
+    a[j] = [ai for ai in a[i]]
+    a[i] = [aj for aj in tmp]
+    return a
+
+
+def swap_cols(A, i, j):
+
+    a = deepcopy(A)
+    rows = len(a)
+    if i == j: return a
+    tmp = []
+    for row in range(rows):
+        tmp.append(a[row][j])
+    for row in range(rows):
+        a[row][j] = a[row][i]
+    for row in range(rows):
+        a[row][i] = tmp[row]
+    return a
+
+
+def max_element(A, row, col):
+    n = len(A)
+    idx = (row, col)
+    max_arg = abs(A[row][col])
+    for r in range(row, n):
+        for c in range(col, n):
+            if (narg:=abs(A[r][c])) >= max_arg:
+                max_arg = narg
+                idx = (r, c)
+    
+    return idx, max_arg
+
+
 def norm(v: list) -> float:
     if not isinstance(v, list):
         raise TypeError('Vector must be list type')    
@@ -214,12 +253,7 @@ def find_row_with_max_element(m, col_num: int=0, starting_row: int=0):
 
 def identity(ndim: int) -> list:
     
-    matrix = [[0.0 for i in range(ndim)] for row in range(ndim)]
-
-    for i in range(len(matrix)):
-        matrix[i] = [1 if i == j else 0 for j in range(len(matrix))]
-    
-    return matrix
+    return [[float(i == j) for i in range(ndim)] for j in range(ndim)]
 
 
 def zeros(ndim: int) -> list:

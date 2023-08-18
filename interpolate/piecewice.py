@@ -1,5 +1,6 @@
 import os
 import sys
+import scipy
 
 
 from copy import deepcopy
@@ -56,8 +57,16 @@ class Line:
 
 class Polynomial:
 
-    def __init__(self):
-        pass
+    def __init__(self, coef: list):
+        self.__degree = len(coef)
+        self.__coef = coef
+
+    @property
+    def degree(self) -> int:
+        return self.__degree
+
+    def __call__(self, var: float | int) -> float | int:
+        return sum([c * var ** i for i, c in enumerate(self.__coef)])
 
 
 class Interpolate:
@@ -88,30 +97,45 @@ class Interpolate:
                     self.__points[i], self.__points[i+1]
                 ))
                 self.__objects[i].eval()
-        else:
-            x = [xi[0] for xi in self.__points]
-            print(x)
-            y = [yi[1] for yi in self.__points]
-            ys = [0.0 for i in range(3*(k-1))]
-            xs = [[0.0 for i in range(3 * (k - 1))] for j in range(3 * (k - 1))]
+        elif self.__n == 2:
+            # compute coefficients
+            pts = deepcopy(self.__points)
+            y = [0.0 for row in range(3 * (k - 1))]
+            x = [[0.0 for col in range(3 * (k - 1))] for row in range(3 * (k - 1))]
+
+            xrow = (k - 2) * 2 + 1
+
+            # Setup [X] and [Y]
+            y[0] = pts[0][1]
+            y[xrow] = pts[-1][1]
             
-            ys[0] = y[0]
-            ys[2 * k - 3] = y[-1]
+            x[0][0], x[0][1], x[0][2] = 1, pts[0][0], pts[0][0] ** 2
+            x[xrow][xrow + 1], x[xrow][xrow + 2], x[xrow][xrow + 3] = 1, pts[-1][0], pts[-1][0] ** 2
+            x[-1][2] = 2
 
-            for i in range(1, k-1):
-                for j in range(i, i+2):
-                    ys[i + j - 1] = y[i]
+            rows = k - 2
+            for row in range(1, rows + 2, 2):
+                xrow = row + k
+                if row == 1:
+                    xi = pts[row][0]
+                    yi = pts[row][1]
+                    
+                    x[row][0], x[row][1], x[row][2] = 1, xi, xi ** 2
+                    x[row + 1][row + 2], x[row + 1][row + 3], x[row + 1][row + 4] = 1, xi, xi ** 2
+                    x[xrow + 1][1], x[xrow + 1][2] = 1, 2 * xi
+                    x[xrow + 1][4], x[xrow + 1][5] = -1, -2 * xi
 
-            tmp = []
-            for i in range(len(x)):
-                tmp.append([x[i] ** j for j in range(self.__n + 1)])
-            print(tmp)
-            for r in range(0, 2 * k - 3, 2):
-                xs = [x[i] ** j for j in range(self.__n)]
-                
+                    y[row], y[row + 1] = yi, yi
+                else:
+                    xi = pts[row - 1][0]
+                    yi = pts[row - 1][1]
+                    x[row][row], x[row][row + 1], x[row][row + 2] = 1, xi, xi ** 2
+                    x[row + 1][row + 3], x[row + 1][row + 4], x[row + 1][row + 5] = 1, xi, xi ** 2
+                    x[xrow][row], x[xrow][row + 1], x[xrow][row + 2] = 0.0, 1.0, 2 * xi
+                    x[xrow][row + 3], x[xrow][row + 4], x[xrow][row + 5] = 0.0, 1.0, 2 * xi
+                    y[row], y[row + 1] = yi, yi
 
-            print(xs)
-
+            print(x)
             
     def __call__(self, x):
         idx = self.__index(x)
