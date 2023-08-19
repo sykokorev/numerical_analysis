@@ -113,58 +113,32 @@ def pivot_mat(A):
     return id_mat
 
 
-# def lup(A):
+def lup(A, permute_l = False):
 
-#     n = len(A)
-#     P = identity(n)
+    n = len(A) # Matrix width
+    P = identity(n) # Pivot matix. Storage permutations.
+    U = deepcopy(A) # Upper triangular matrix
+    L = identity(n) # lower triangular matrix
 
-#     for k in range(n):
+    # Partial pivoting
+    for k in range(n):
+        j = max(range(k, n), key=lambda i: abs(U[i][k]))
+        I = identity(n)
+        I[k], I[j] = I[j], I[k]
+        P = mat_mul(P, I)
+        U[k], U[j] = U[j], U[k]
 
-#         rc, arg = max_element(A, k, k)
-#         # print(k, rc, arg)
-#         A = swap_rows(A, k, rc[0])
-#         A = swap_cols(A, k, rc[1])
-#         P = swap_rows(P, k, rc[0])
-#         P = swap_cols(P, k, rc[1])
-#         pivot = A[k][k]
-#         A[k] = [ai / pivot for ai in A[k]]
-#         for row in range(k + 1, n):
-#             if A[row][k] != 0.0:
-#                 ratio = A[k][k] * A[row][k]
-#                 A[row] = [ai - ak * ratio for ai, ak in zip(A[row], A[k])]
-   
-#     return P, A
+        for row in range(k + 1, n):
+            if U[row][k] != 0.0:
+                ratio = (-1) * U[k][k] / U[row][k]
+                U[row] = [ui + uk / ratio for ui, uk in zip(U[row], U[k])]
 
+    if permute_l:
+        L = mat_mul(A, inverse(U))
+    else:
+        L = mat_mul(mat_mul(inverse(P), A), inverse(U))
 
-def lup(A):
-
-    n = len(A)
-
-    L = zeros(n)
-    U = zeros(n)
-    P = pivot_mat(A)
-
-    PA = mat_mul(P, A)
-
-    for i in range(n):
-
-        for k in range(i, n):
-            s1 = 0.0
-            for j in range(i):
-                s1 += L[i][j] * U[j][k]
-            U[i][k] = A[i][k] - s1
-
-        for k in range(i, n):
-            if i == k:
-                L[i][i] == 1.0
-            else:
-                s2 = 0.0
-                for j in range(i):
-                    s2 += L[k][j] * U[j][i]
-                L[k][i] = (A[k][i] - s2) / U[i][i]
-    
     return (P, L, U)
-
 
 def solveLU(a, b):
 
