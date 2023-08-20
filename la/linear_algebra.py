@@ -256,8 +256,13 @@ def identity(ndim: int) -> list:
     return [[float(i == j) for i in range(ndim)] for j in range(ndim)]
 
 
-def zeros(ndim: int) -> list:
-    return [[0.0 for i in range(ndim)] for j in range(ndim)]
+def zeros(ndim: int, axis: int = 1) -> list:
+    if axis == 1:
+        return [0.0 for i in range(ndim)]
+    elif axis == 2:
+        return [[0.0 for i in range(ndim)] for j in range(ndim)]
+    else:
+        return None
 
 
 def compare(m1: list, m2: list) -> bool:

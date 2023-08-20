@@ -140,6 +140,36 @@ def lup(A, permute_l = False):
 
     return (P, L, U)
 
+
+def forward_sub(L, b):
+
+    n = len(L)
+    x = zeros(n)
+
+    for i in range(n):
+        tmp = b[i]
+        for j in range(i):
+            tmp -= L[i][j] * x[j]
+        x[i] = tmp / L[i][i]
+    
+    return x
+
+
+def back_sub(U, b):
+
+    n = len(U)
+    x = zeros(n)
+
+    for i in range(n - 1, -1, -1):
+        tmp = b[i]
+        print(tmp)
+        for j in range(i + 1, n):
+            tmp -= U[i][j] * x[j]
+    x[i] = tmp / U[i][i]
+
+    return x
+
+
 def solveLU(a, b):
 
     '''
@@ -161,6 +191,35 @@ def solveLU(a, b):
         x[i] = (1 / u[i][i]) * (y[i] - sum(u[i][j] * x[j] for j in range(i+1, width)))
 
     return x
+
+
+def solveLUP(A, b):
+
+    '''
+        Solving system of equations with partial pivoting
+        [A]{x} = {b} => [P][L][U]{x} = {b} => 
+        => [P][L]{y} = {b}, [L]{y} = {b}(inverse([P])),
+        where {y} = [U]{x} => {x} = {y}(inverse([U]))
+    '''
+
+    n = len(A)
+    y = [0.0 for i in range(n)]
+    x = [0.0 for i in range(n)]
+
+    P, L, U = lup(A, permute_l=False)
+    
+    bP = mat_mul(b, inverse(P))
+
+    # Forward substitution [L]{y} = {b}, {y} = [U]{x}
+    for i in range(n):
+        y[i] = (1 / L[i][i]) * (bP[i] - sum(L[i][j] * y[j] for j in range(i)))
+    
+    # Backward substitution [L]{x} = {y}
+    for i in range(n-1, -1, -1):
+        x[i] = (1 / U[i][i]) * (y[i] - sum(U[i][j] * x[j] for j in range(i+1, n)))
+    
+    return x
+
 
 
 def cholesky(a):
