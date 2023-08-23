@@ -29,9 +29,8 @@ if __name__ == "__main__":
     points = np.array([
         [-1.0, 0.038], [-0.8, 0.058],
         [-0.60, 0.1], [-0.4, 0.2],
-        [-0.2, 0.5], [-0.01, y1], [-0.001, y2],
-        [0.001, y3], [0.01, y4],
-        [0.2, 0.5], [0.4, 0.2],
+        [-0.2, 0.5], [-0.001, y2],
+        [0.001, y3],[0.2, 0.5], [0.4, 0.2],
         [0.6, 0.1], [0.8, 0.058],
         [1.0, 0.038]
     ])
@@ -59,7 +58,7 @@ if __name__ == "__main__":
     #     yp.append(runge(1, 1, 5, xi))
     #     y1.append(interp(xi)[1])
 
-    xp = np.linspace(-1.0, 1.0, 100)
+    xp = np.linspace(-1.0, 1.0, 1000)
     yp = []
     y1 = []
     # for xi in xp:
@@ -80,7 +79,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.scatter(points[:, 0], points[:, 1], marker='o', color='g', label='Points')
     ax.plot(xp, y1, marker='', color='k', label=f'Polynomial spline degree {interp.n}')
-    ax.scatter(xp, yp, marker='*', color='r', label='Runge func')
+    ax.plot(xp, yp, marker='', color='r', label='Runge func')
 
     ax.grid(True)
     fig.legend()
