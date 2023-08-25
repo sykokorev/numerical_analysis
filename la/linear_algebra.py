@@ -88,16 +88,29 @@ def dot(m1: list, m2: list) -> float or bool:
 
 def mat_mul(m1: list, m2: list) -> list:
 
+    # Multiply a matrix by a scalar
+    if isinstance(m1, int | float) and hasattr(m2, '__iter__'):
+        if isinstance(m2[0], int | float): 
+            return [m1 * m2i for m2i in m2]
+        else:
+            return [mat_mul(m1, m2[i]) for i in range(len(m2))]
+
+    if isinstance(m2, int | float) and hasattr(m1, '__iter__'):
+        if isinstance(m1[0], int | float): 
+            return [m2 * m1i for m1i in m1]
+        else:
+            return [mat_mul(m2, m1[i]) for i in range(len(m1))]
+
     # Multiply a matrix by a vector
 
-    if isinstance(m1[0], (float, int)) and isinstance(m2[0], list):
-        res = [0.0 for i in range(len(m1))]
+    if isinstance(m1[0], (float, int)) and hasattr(m2[0], '__iter__'):
+        res = [0.0 for i in range(len(m2))]
         for i, el in enumerate(m2):
             res[i] = sum([eli * m1i for eli, m1i in zip(el, m1)])
         return res
         
-    if isinstance(m2[0], (float, int)) and isinstance(m1[0], list):
-        res = [0.0 for i in range(len(m2))]
+    if isinstance(m2[0], (float, int)) and hasattr(m1[0], '__iter__'):
+        res = [0.0 for i in range(len(m1))]
         for i, el in enumerate(m1):
             res[i] = sum([eli * m2i for eli, m2i in zip(el, m2)])
         return res
@@ -105,6 +118,7 @@ def mat_mul(m1: list, m2: list) -> list:
     # Multiply a matrix by a mtrix
 
     n, m, p, q = len(m1), len(m1[0]), len(m2), len(m2[0])
+
     if m != p:
         raise ValueError('Number of rows of first matrix mus be equal number of columns second matrix')
     
