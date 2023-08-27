@@ -17,7 +17,7 @@ from la.linear_algebra import *
 from la.linalg import solveLUP as lup
 
 
-def lm(f, xdata, ydata, p0=None, jac=None, est=10e-6):
+def lm(f, xdata, ydata, p0=None, jac=None, lam0=0, iter=0):
 
     '''
 
@@ -40,11 +40,18 @@ def lm(f, xdata, ydata, p0=None, jac=None, est=10e-6):
                 est: float | array_like
                     Approxiamtion error. If float then the estimation error apply to all
                     parameters of the model
+                lam0: float
+                    Initial damping factor
+                update: bool
+                    Whether it is necessary to update the Jacobi matrix
     Returns: potp: array
                     Optimal values for the parameters so that the sum of the squared
                     residuals of f(xdata, *popt) - ydata is minimized
     
     '''
+
+    if iter >= 800:
+        raise RuntimeError('Optimal parameters not found. Number of calls to function has reached 800')
 
     if not any([isinstance(xi, float | int) for xi in xdata]):
         raise ValueError('Incompatable data for xdata values')
@@ -52,6 +59,9 @@ def lm(f, xdata, ydata, p0=None, jac=None, est=10e-6):
         raise ValueError('Incompatable data for ydata values')
     if not hasattr(f, '__call__'):
         raise ValueError('First argument must be callable')
+
+    a = 2
+    b = 3
 
     n = len(xdata)
     nargs = len(signature(f).parameters) - 1
@@ -71,17 +81,35 @@ def lm(f, xdata, ydata, p0=None, jac=None, est=10e-6):
         for i in range(n):
             J[i] = jac(xdata[i], *popt)
 
-    # Compute Hessian and gradient of the function
+    # Compute Hessian matrix and gradient of the function
     JT = transpose(J)
     H = mat_mul(JT, J)
-    g = mat_mul(JT, fx)
+
+    Hdiag = [[H[i][j] if i == j else 0.0 for i in range(nargs)] for j in range(nargs)]
 
     # Compute step
-    step = lup(H, mat_mul(JT, [yi - f(xi, *popt) for xi, yi in zip(xdata, ydata)]))
-    popt_new = [p + pn for p, pn in zip(popt, step)]
+    # Apply damping factor to the Hassian matrix
+    Hlam = mat_add(H, mat_mul(lam0, Hdiag))
+    # Compute RHS equation and step
+    rhs = mat_mul(JT, [yi - fxi for yi, fxi in zip(ydata, fx)])
+    dp = lup(Hlam, rhs)
+
+    # Compute new parameters
+    popt_new = [p + pn for p, pn in zip(popt, dp)]
+    # Compute function with updated parameters
+    fxn = [f(xi, *popt_new) for xi in xdata]
+    
+    rmse = (sum([(yi - fi) ** 2 for yi, fi in zip(ydata, fx)]) / n) ** 0.5
+    rmse_new = (sum([(yi - fi) ** 2 for yi, fi in zip(ydata, fxn)]) / n) ** 0.5
+
+    es = (abs(rmse - rmse_new) * 100) / rmse
 
     # Check estimation error
-    if all([abs(p - pn) <= est for p, pn in zip(popt, popt_new)]):
+    if es < 10e-4 or rmse < 10e-8:
         return popt_new, [abs(p - pn) for p, pn in zip(popt, popt_new)]
     else:
-        return lm(f, xdata, ydata, popt_new, jac, est)
+        if rmse_new > rmse:
+            lam0 *= 10
+        else:
+            lam0 /= 10
+        return lm(f, xdata, ydata, popt_new, jac, lam0, iter+1)

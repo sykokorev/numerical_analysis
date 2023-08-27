@@ -149,13 +149,41 @@ def scalar_mul(m1: list | float, m2: list | float) -> list:
 
 
 def mat_add(m1: list, m2: list) -> list:
-    if isinstance(m1[0], (int, float)) and isinstance(m2[0], (int, float)):
-        return [m1i + m2i for m1i, m2i in zip(m1, m2)]
-    return list(map(sum, zip(*i)) for i in zip(m1, m2))
+
+    if isinstance(m1, int | float) and isinstance(m2, int | float):
+        return m1 + m2
+
+    if isinstance(m1, int | float) and hasattr(m2, '__iter__'):
+        if isinstance(m2[0], int | float): 
+            return [m1 + m2i for m2i in m2]
+        else:
+            return [mat_add(m1, m2[i]) for i in range(len(m2))]
+
+    if isinstance(m2, int | float) and hasattr(m1, '__iter__'):
+        if isinstance(m1[0], int | float): 
+            return [m2 + m1i for m1i in m1]
+        else:
+            return [mat_add(m2, m1[i]) for i in range(len(m1))]
+    
+    if hasattr(m1, '__iter__') and hasattr(m2, '__iter__'):
+        if isinstance(m1[0], int | float) and isinstance(m2[0], int | float):
+            return [m1i + m2i for m1i, m2i in zip(m1, m2)]
+        elif hasattr(m1[0], '__iter__') and hasattr(m2[0], '__iter__'):
+            return [mat_add(m1[i], m2[i]) for i in range(len(m1))]
 
 
 def mat_sub(m1: list, m2: list) -> list:
-    return list(map(sum, zip(i, [(-1) * ji for ji in j])) for i, j in zip(m1, m2))
+    if isinstance(m1, int | float) and hasattr(m2, '__iter__'):
+        if isinstance(m2[0], int | float): 
+            return [m1 - m2i for m2i in m2]
+        else:
+            return [mat_sub(m1, m2[i]) for i in range(len(m2))]
+
+    if isinstance(m2, int | float) and hasattr(m1, '__iter__'):
+        if isinstance(m1[0], int | float): 
+            return [m2 - m1i for m1i in m1]
+        else:
+            return [mat_sub(m2, m1[i]) for i in range(len(m1))]
 
 
 def transpose(m) -> list:
