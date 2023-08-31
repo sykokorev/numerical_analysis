@@ -51,16 +51,16 @@ def lm(f, xdata, ydata, p0=None, jac=None, lam0 = 10, est = 1e-6, iter=0):
     n = len(xdata)
     nargs = len(signature(f).parameters) - 1
     popt = [1.0 for i in range(nargs)] if not p0 else p0
-    delarg = 10e-6
+    delarg = 1e-6
     J = [[0.0 for i in range(nargs)] for j in range(n)]
     fx = [f(xi, *popt) for xi in xdata]
     
     if not jac:
         for i in range(n):
             for j in range(nargs):
-                args1 = [popt[k] + delarg if k == j else popt[k] for k in range(nargs)]
-                args2 = [popt[k] - delarg if k == j else popt[k] for k in range(nargs)]
-                J[i][j] = (f(xdata[i], *args1) - f(xdata[i], *args2)) / (2 * delarg)
+                args1 = [popt[k] + delarg * popt[k] if k == j else popt[k] for k in range(nargs)]
+                args2 = [popt[k] - delarg * popt[k] if k == j else popt[k] for k in range(nargs)]
+                J[i][j] = (f(xdata[i], *args1) - f(xdata[i], *args2)) / (2 * delarg * popt[j])
     else:
         for i in range(n):
             J[i] = jac(xdata[i], *popt)

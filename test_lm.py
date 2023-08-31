@@ -25,6 +25,10 @@ def mm_kinetic(x, b1, b2):
     return b1 * x / (b2 + x)
 
 
+def poly6(x, a0, a1, a2, a3, a4, a5, a6):
+    return a0 + a1 * x + a2 * x ** 2 + a3 * x ** 3 + a4 * x ** 4 + a5 * x ** 6 + a6 * x ** 7
+
+
 def Rosenbrock(xy, a, b):
     return (a - xy[0]) ** 2 + b * (xy[1] - xy[0] ** 2) ** 2
 
@@ -34,8 +38,8 @@ DIR = os.path.abspath('tmp')
 
 if __name__ == "__main__":
 
-    f = func
-    params = [0.1, 0.5, 0.3]
+    f = poly6
+    params = [0.1, 0.5, 0.6, 0.3, 0.5, 0.15, 0.33]
 
     for i in range(10):
 
@@ -44,7 +48,7 @@ if __name__ == "__main__":
         xdata = np.linspace(0, 4, 50)
         y = f(xdata, *params)
         rng = np.random.default_rng()
-        y_noise = 0.2 * rng.normal(size=xdata.size)
+        y_noise = rng.normal(size=xdata.size, scale=500)
         ydata = y + y_noise
         
         try:
