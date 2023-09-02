@@ -86,3 +86,50 @@ def lm(f, xdata, ydata, p0=None, jac=None, lam0 = 10, est = 1e-6, iter=0):
         return lm(f, xdata, ydata, popt, jac, lam0 * 10, est, iter)
     else:
         return lm(f, xdata, ydata, popt_new, jac, lam0 / 10, est, iter+1)
+
+
+def polyfit(xdata, ydata, order: int = 1, p0: list = None, lam0 = 10, est=1e-6, iter=0):
+
+    '''
+        Construct the polynomial order n and return optimal
+        coefficietns to fit data points
+    '''
+
+    def poly(x, *args):
+        return sum([c * x ** i for i, c in enumerate(args)])
+    
+    f = poly
+    n = len(xdata)
+    nargs = order
+    popt = [1.0 for i in range(nargs)] if not p0 else p0
+    delarg = 1e-6
+    J = [[0.0 for i in range(nargs)] for j in range(n)]
+    fx = [poly(xi, *popt) for xi in xdata]
+    
+    for i in range(n):
+        for j in range(nargs):
+            args1 = [popt[k] + delarg * popt[k] if k == j else popt[k] for k in range(nargs)]
+            args2 = [popt[k] - delarg * popt[k] if k == j else popt[k] for k in range(nargs)]
+            J[i][j] = (f(xdata[i], *args1) - f(xdata[i], *args2)) / (2 * delarg * popt[j])
+
+    JT = transpose(J)
+    H = mat_mul(JT, J)
+    H_diag = [[H[i][j] if i == j else 0.0 for i in range(nargs)] for j in range(nargs)]
+    H_lam = mat_add(H, mat_mul(lam0, H_diag))
+    rhs = mat_mul(JT, [yi - fxi for yi, fxi in zip(ydata, fx)])
+    dp = mat_mul(rhs, inverse(H_lam))
+
+    popt_new = [p + dpi for p, dpi in zip(popt, dp)]
+    fx_new = [f(xi, *popt_new) for xi in xdata]
+
+    rmse = (sum([(yi - fi) ** 2 for yi, fi in zip(ydata, fx)]) / n)
+    rmse_new = (sum([(yi - fi) ** 2 for yi, fi in zip(ydata, fx_new)]) / n)
+
+    es = abs(rmse - rmse_new) / rmse
+
+    if es < est:
+        return popt_new
+    elif rmse_new > rmse:
+        return polyfit(xdata, ydata, order, popt, lam0 * 10, est, iter)
+    else:
+        return polyfit(xdata, ydata, order, popt_new, lam0 / 10, est, iter+1)
