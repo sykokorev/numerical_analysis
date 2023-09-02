@@ -28,6 +28,10 @@ def funcint(x):
     return 2 * x - (x ** 3) / 3 + 0.1 * (0.7 / (2 * math.pi)) * np.sin(2 * math.pi * x / 0.7)
 
 
+def runge(x):
+    return 1 / (1 + 25 * x ** 2)
+
+
 def poly(x, *args):
     return sum([c * x ** i for i, c in enumerate(args)])
 
@@ -35,10 +39,10 @@ def poly(x, *args):
 if __name__ == "__main__":
 
     args = [2, 0.1, 0.7]
-    a, b = 0.1, 1.0 # Integration limits
-    h = 11 # Number of points divided the function func
+    a, b = -1.0, 1.0 # Integration limits
+    h = 21 # Number of points divided the function func
 
-    x = np.linspace(a, b, 50)
+    x = np.linspace(a, b, 100)
     y = func(x, *args)
 
     xdata = np.linspace(a, b, h)
@@ -58,6 +62,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.plot(x, y, marker='', color='k', label='func')
     ax.scatter(xdata, ydata, marker='o', color='r', label='polynomial')
+    ax.plot(xdata, ydata, marker='', color='g')
 
     ax.grid(True)
     fig.legend()
