@@ -42,7 +42,8 @@ if __name__ == "__main__":
     x = np.linspace(a, b, 100)
     y = func(x)
 
-    It = trapezoid(func, xdata)
+    It, error = trapezoid(func, a, b, 128)
+    
     I0 = funcint(b) - funcint(a)
     print(f'Exact integral {I0 = }')
     print(f'Trapezoidal intgral with step {h = }, {It = }')
@@ -62,13 +63,13 @@ if __name__ == "__main__":
     n = 72
     h = (b - a) / (n - 1)
     x = np.linspace(a, b, n)
-    It = trapezoid(exp, x)
-    Ir = rectangle(exp, x, method='mid')
+    It = trapezoid(exp, a, b, 72)
+    Ir = rectangle(exp, a, b, n, method='mid')
     I0 = exp(b) - exp(a)
     E = exp(b) * (b - a) * (h ** 2) / 12
 
-    print(f'Integration by trapezoid method: {It = }')
+    print(f'Integration by trapezoid method: {It[0] = }')
     print(f'Integration by rectangle mid point: {Ir = }')
     print(f'Exact itegration: {I0 = }')
-    print(f'The upper bound error: {E = }. The trapezoid method error: {abs(I0 - It)}')
+    print(f'The upper bound error: {E = }. The trapezoid method error: {abs(I0 - It[0])}')
 

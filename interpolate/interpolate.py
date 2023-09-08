@@ -36,8 +36,7 @@ def polyfit(points: list):
 
 def divided_diff(x, y, b=[]):
     '''
-        Function to calculate the divided
-        difference
+        Function to calculate the divided difference
     '''
     n = len(x)
 

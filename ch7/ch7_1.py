@@ -10,7 +10,7 @@ DIR = os.path.abspath(os.path.join(
 sys.path.append(DIR)
 
 
-from interpolate.interpolation import *
+from interpolate.interpolate import *
 
 
 def polynomial(coef: list, x: list):

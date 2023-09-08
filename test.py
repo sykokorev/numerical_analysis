@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import sys
-import sympy
+import numpy as np
 
 from sympy.core import mul, Expr
 
@@ -13,13 +13,14 @@ LIBDIR = os.path.abspath(
 )
 sys.path.append(LIBDIR)
 
-from symbols.symbol import *
+from integration.integrate import romberg
 
 
 if __name__ == "__main__":
 
-    x = Symbol('x')
-    z = Symbol('z')
+    gaussian = lambda x: 1 / np.sqrt(np.pi) * np.exp(-x ** 2)
 
-    exp = x ** 2
-    print(exp)
+    I = romberg(gaussian, 0, 1)
+    print(I)
+
+    

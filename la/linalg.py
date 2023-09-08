@@ -1,6 +1,7 @@
 import sys
 
 from typing import Tuple, List
+from inspect import signature
 
 
 from la.linear_algebra import *
@@ -338,7 +339,7 @@ def fixed_point(fx: list, x0: list, es: float = 10 ** -6, max_it: int = 100, cur
         return fixed_point(fx, x, es, max_it, current_it + 1)
 
 
-def newton_raphson(fx, j, x0, es = 10 ** -6, max_iter = 100, current_it = 0, w = 1.0):
+def newton_raphson(fx: list, jac: callable = None, x0: list = None, es = 10 ** -6, w: float | List[float] = None, iter: int = 0):
 
     '''
         Newton-Raphson method for solving nonlinear system of equations
@@ -352,20 +353,46 @@ def newton_raphson(fx, j, x0, es = 10 ** -6, max_iter = 100, current_it = 0, w =
             where {del_x} = -inverse([J]){f}
                   [J] is a Jacobian of {f} (nxn matrix)
 
-            fx is {f}
-            j is [J]
-            x0 is an initial guess
-            w is a relaxation factor 0.0 < w < 2.0
+            fx: List[callable]: list of equations
+            jac: callable (default None): function that returns Jacobian matrix jac(*x0). If None Jacobian matrix wil
+                    be computed numerically
+            x0: list[float] (default None) is an initial guess, if None then will be set to 1.0 for all arguments
+            w: float or list[float] (default None) is a relaxation factor 0.0 < w < 2.0 if None solve system without weight
     '''
 
-    func = [fxi(x0) for fxi in fx]
-    jac = inverse(j(x0))
-    delx = mat_mul(scalar_mul(-1, jac), func)
+    if iter > 800:
+        raise RuntimeError('Maximum number of iterations exceeded. No solution found.')
     
-    x = mat_add(x0, scalar_mul(w, delx))
+    n = len(fx)
+    nargs = len(signature(fx[0]).parameters)
+
+    if n != nargs:
+        raise RuntimeError('Undefined system of equations')
+
+    if not x0: x0 = [1.0 for i in range(nargs)]
+
+    if not jac:
+        jac1 = [[0.0 for i in range(nargs)] for j in range(n)]
+        for i in range(n):
+            for j in range(nargs):
+                dx = x[j] * 1e-6
+                args1 = [x0[k] if k != j else x0[k] + dx for k in range(nargs)]
+                args2 = [x0[k] if k != j else x0[k] - dx for k in range(nargs)]
+                jac1[i][j] = (fx[i](*args1) - fx[i](*args2)) / (x * dx)
+    else:
+        jac1 = jac(*x0)
+
+    func = [fxi(*x0) for fxi in fx]
+    jac1 = inverse(jac1)
+    delx = mat_mul(mat_mul((-1), jac1), func)
+    if not w:
+        x = mat_add(x0, delx)
+    else:
+        x = mat_add(x0, mat_mul(w, delx))
     er = norm(delx) / norm(x)
 
     if er <= es:
         return x
     else:
-        return newton_raphson(fx, j, x, es, max_iter, current_it - 1, w)
+        return newton_raphson(fx, jac, x, es, w, iter + 1)
+

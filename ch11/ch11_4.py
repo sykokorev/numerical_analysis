@@ -44,15 +44,15 @@ if __name__ == "__main__":
     ydata = func(xdata)
 
     I0 = funcint(b) - funcint(a)
-    Is1 = simpson(func, xdata, method=1)
-    Is2 = simpson(func, xdata, method=2)
+    Is1 = simpson(func, a, b, n, method=1)
+    Is2 = simpson(func, a, b, n, method=2)
 
     print('Integral func')
     print(f'Exact integral: {I0 = }')
-    print(f'Simpson\'s 1/3 rule with {h = }, {Is1 = }')
-    print(f'Simpson\'s 8/3 rule with {h = }, {Is2 = }')
-    print(f'Simpson\'s 1/3 error E = {abs(I0 - Is1)}')
-    print(f'Simpson\'s 3/8 error E = {abs(I0 - Is2)}')
+    print(f'Simpson\'s 1/3 rule with {h = }, {Is1[0] = }')
+    print(f'Simpson\'s 3/8 rule with {h = }, {Is2[0] = }')
+    print(f'Simpson\'s 1/3 error E = {abs(I0 - Is1[0])}')
+    print(f'Simpson\'s 3/8 error E = {abs(I0 - Is2[0])}')
 
     print('Integral exp')
     a = 0.0
@@ -68,13 +68,13 @@ if __name__ == "__main__":
     ydata = exp(xdata)
 
     I0 = exp(b) - exp(a)
-    Is1 = simpson(exp, xdata, method=1)
-    Is2 = simpson(exp, xdata, method=2)
+    Is1 = simpson(exp, a, b, n, method=1)
+    Is2 = simpson(exp, a, b, n, method=2)
     E = exp(b) * (b - a) * (h ** 4 / 180)
     print(f'Exact integral: {I0 = }')
-    print(f'Simpson\'s rule 1/3 with {h1 = }: {Is1 = }')
-    print(f'Simpson\'s 8/3 rule with {h2 = }, {Is2 = }')
+    print(f'Simpson\'s rule 1/3 with {h1 = }: {Is1[0] = }')
+    print(f'Simpson\'s 8/3 rule with {h2 = }, {Is2[0] = }')
     print(f'Upper bound error for 1/3 rule: {E = }')
-    print(f'Simpson\'s 1/3 error E = {abs(I0 - Is1)}')
-    print(f'Simpson\'s 3/8 error E = {abs(I0 - Is2)}')
+    print(f'Simpson\'s 1/3 error E = {abs(I0 - Is1[0])}')
+    print(f'Simpson\'s 3/8 error E = {abs(I0 - Is2[0])}')
 

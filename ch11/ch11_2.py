@@ -34,9 +34,9 @@ if __name__ == "__main__":
     x = np.linspace(a, b, h)
     y = func(x)
     I0 = polyint(b, 0, 0, 1) - polyint(a, 0, 0, 1)
-    I1 = rectangle(func, x, method='mid')
-    I2 = rectangle(func, x, method='right')
-    I3 = rectangle(func, x, method='left')
+    I1 = rectangle(func, a, b, h,method='mid')
+    I2 = rectangle(func, a, b, h, method='right')
+    I3 = rectangle(func, a, b, h, method='left')
 
     print(I0, I1, I2, I3)
 
@@ -48,9 +48,9 @@ if __name__ == "__main__":
     y = exp(x)
     
     I0 = exp(b) - exp(a)
-    I1 = rectangle(exp, x, method='left')
-    I2 = rectangle(exp, x, method='mid')
-    I3 = rectangle(exp, x, method='right')
+    I1 = rectangle(exp, a, b, h, method='left')
+    I2 = rectangle(exp, a, b, h, method='mid')
+    I3 = rectangle(exp, a, b, h, method='right')
 
     print(f'Explicit {I0=}')
     print(f'Left sum(f(xi-1)), {I1=}')

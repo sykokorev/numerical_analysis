@@ -92,7 +92,7 @@ def polyfit(xdata, ydata, order: int = 1, p0: list = None, lam0 = 10, est=1e-6, 
 
     '''
         Construct the polynomial order n and return optimal
-        coefficietns to fit data points
+        coefficietns to fit data points with using LM algorithm
     '''
 
     def poly(x, *args):

@@ -13,18 +13,30 @@ sys.path.append(DIR)
 from la.linalg import *
 
 
-def f1(args):
-    return args[0] ** 2 + args[0] * args[1] - 10
+def f1(x0, x1, x2):
+    return x0 ** 2 + x1 * x0 - 10 * x2
 
 
-def f2(args):
-    return args[1] + 3 * args[0] * args[1] ** 2 - 57
+def f2(x0, x1, x2):
+    return x1 + 3 * x0 * x1 ** 2 - 57 * x2
 
 
-def jacobian(args):
+def f3(x0, x1, x2):
+    return x0 ** 3 + x1 * x0 - 2 * x2 - 12
+
+
+def f4(x1, x2):
+    return x1 + x2 - 1
+
+
+def f5(x1, x2):
+    return x1 ** 2 - x2 - 5
+
+
+def jac(x0, x1):
     return [
-        [2 * args[0] + args[1], args[0]],
-        [3 * args[1] ** 2, 1 + 6 * args[0] * args[1]]
+        [2 * x0 + x1, x0],
+        [3 * x0 ** 2 + x1, 1 + 6 * x0 * x1 ** 2]
     ]
 
 
@@ -45,5 +57,6 @@ if __name__ == "__main__":
     '''
 
     x0 = [1.5, 3.5]
-    x = newton_raphson([f1, f2], jacobian, x0, 0.0001)
+    x = newton_raphson([f1, f2, f3])
+    print(f1(*x), f2(*x), f3(*x))
     print(x)

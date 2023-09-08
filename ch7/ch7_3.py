@@ -11,7 +11,7 @@ DIR = os.path.abspath(os.path.join(
 sys.path.append(DIR)
 
 
-from interpolate.interpolation import *
+from interpolate.interpolate import *
 
 
 if __name__ == "__main__":
