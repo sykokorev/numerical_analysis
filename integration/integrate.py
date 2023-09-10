@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+from math import floor
 
 
 DIR = os.path.abspath(os.path.join(
@@ -11,6 +12,46 @@ sys.path.append(DIR)
 
 
 from la.linalg import zeros
+
+
+def factor(n):
+
+    if n == 0:
+        return 1
+    elif n == 1:
+        return 1
+    else:
+        return n * factor(n - 1)
+    
+
+def binomial(n, k):
+    if n < k:
+        return 0
+    return factor(n)  / (factor(k) * factor(n - k))
+
+
+def legendre_poly_coef(n: int) -> list:
+    '''
+        Compute coefficients of Legendre polynomials degree n
+        -----------------------------------------------------
+            Paramters: n: int
+                Polynomial degree
+            Returns: list
+                returns list of coefficients and degree of undependet veriable
+                of the Legendre polynomial
+                [(a0, k0), (a1, k1), (a2, k2), (a3, k3) ...]
+                L(x) = a0 * x ** k + a1 * x ** k1 + a2 * x ** k2 + ...
+    '''
+    const = 1 / 2 ** n
+    return [(
+        const * (-1) ** k * binomial(n, k) * binomial(2 * n - 2 * k, n), 
+        n - 2 * k
+        ) for k in range(0, floor(n / 2) + 1)]
+
+
+def legendre_poly(x, *args):
+
+    return sum([a[0] * x ** a[1] for a in args])
 
 
 def polyint(x, *coeff):
@@ -165,3 +206,18 @@ def romberg(f: callable, a: float, b: float, args: list = (), tol=1.48e-08, rtol
             return r[-1][0]
     
     return None
+
+
+def gauss_quad(f: callable, n: int = 2) -> float:
+    '''
+        Gaussian quadrature intgration of callable function. 
+        Return the integral of a function f
+        ----------------------------------------------------
+        Parameters:     f: callable
+                            function to be integrated
+                        n: number of points to approximate
+        Returs:         results: float
+                            result of integration
+    '''
+
+    pass

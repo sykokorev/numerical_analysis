@@ -396,3 +396,32 @@ def newton_raphson(fx: list, jac: callable = None, x0: list = None, es = 10 ** -
     else:
         return newton_raphson(fx, jac, x, es, w, iter + 1)
 
+
+def newton_raphson2(f: callable, x0: float = None, args: list = [], tol: float = 1e-6, it: int = 0):
+
+    '''
+        Solve equation of one unknown by using Newton-Raphson method
+        ------------------------------------------------------------
+        Parameters:     f: callable
+                            Function of equation
+                        x0: float (optional)
+                            Initial guess. Update every iteration
+                        args: array_like (optinal)
+                            Extra argument to pass to the function.
+                            Default is to pass no extra arguments
+        Returns:        result: float
+                            root of equation
+    '''
+
+    if it >= 800:
+        raise RuntimeError('Maximum iteration exceeded. No solution found')
+    
+    if not x0 : x0 = 1.0
+    
+    der = (f(x0 + x0 * 1e-6, *args) - f(x0 - x0 * 1e-6, *args)) / (2 * x0 * 1e-6)
+    xnew = x0 - f(x0, *args) / der
+    es = abs(xnew - x0)
+    if es <= tol:
+        return xnew
+    else:
+        return newton_raphson2(f, xnew, args, tol, it  + 1)
