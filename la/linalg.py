@@ -397,7 +397,7 @@ def newton_raphson(fx: list, jac: callable = None, x0: list = None, es = 10 ** -
         return newton_raphson(fx, jac, x, es, w, iter + 1)
 
 
-def newton_raphson2(f: callable, x0: float = None, args: list = [], tol: float = 1e-6, it: int = 0):
+def newton_raphson2(f: callable, x0: float = None, args: list = [], tol: float = 1e-6, w: float = None ,it: int = 0):
 
     '''
         Solve equation of one unknown by using Newton-Raphson method
@@ -419,9 +419,9 @@ def newton_raphson2(f: callable, x0: float = None, args: list = [], tol: float =
     if not x0 : x0 = 1.0
     
     der = (f(x0 + x0 * 1e-6, *args) - f(x0 - x0 * 1e-6, *args)) / (2 * x0 * 1e-6)
-    xnew = x0 - f(x0, *args) / der
+    xnew = x0 - f(x0, *args) / der if not w else x0 - w * f(x0, *args) / der
     es = abs(xnew - x0)
     if es <= tol:
         return xnew
     else:
-        return newton_raphson2(f, xnew, args, tol, it  + 1)
+        return newton_raphson2(f, xnew, args, tol, w, it  + 1)

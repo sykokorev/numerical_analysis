@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import numpy as np
 from math import floor
 
@@ -52,6 +53,11 @@ def legendre_poly_coef(n: int) -> list:
 def legendre_poly(x, *args):
 
     return sum([a[0] * x ** a[1] for a in args])
+
+
+def legendre_der(x, *args):
+
+    return sum([a[0] * a[1] * x ** (a[1] - 1) for a in args])
 
 
 def polyint(x, *coeff):
@@ -208,16 +214,28 @@ def romberg(f: callable, a: float, b: float, args: list = (), tol=1.48e-08, rtol
     return None
 
 
-def gauss_quad(f: callable, n: int = 2) -> float:
+def gauss_quad(f: callable, a: float = -1, b: float = 1, n: int = 2, args: list = []) -> float:
     '''
         Gaussian quadrature intgration of callable function. 
         Return the integral of a function f
         ----------------------------------------------------
         Parameters:     f: callable
                             function to be integrated
-                        n: number of points to approximate
+                        a: float
+                            lower integration interval
+                        b: float
+                            higher integration interval
+                        n: int
+                            number of points to approximate
+                        args: extra arguments to pass to function. Default is to pass no extra arguments
         Returs:         results: float
                             result of integration
     '''
 
-    pass
+    gauss_quad_json = os.path.abspath(os.path.join(
+        os.path.dirname(__file__), 'guassian_quadrature.json'
+    ))
+
+    with open(gauss_quad_json, 'r') as fp:
+        reader = json.load(fp)[n - 1]
+    return sum([((b - a) / 2) * ri[1] * f(((b - a) / 2) * ri[0] + (b + a) / 2, *args) for ri in reader])
