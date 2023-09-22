@@ -18,9 +18,5 @@ from integration.integrate import romberg
 
 if __name__ == "__main__":
 
-    gaussian = lambda x: 1 / np.sqrt(np.pi) * np.exp(-x ** 2)
-
-    I = romberg(gaussian, 0, 1)
-    print(I)
-
-    
+    root = np.roots([1, 2, 3, 4])
+    print(root)

@@ -27,15 +27,18 @@ def func2(x):
     return 1 / (2 + x)
 
 
-def func3(x):
-    return 0.5 * math.exp((-1) * ((1 + x) / 2) ** 2)
+def func2int(x):
+    return math.log(x)
 
 
 if __name__ == "__main__":
+
+    I = func2int(3) - func2int(1)
+    print(f'Exact integral I = {I}')
 
     for i in range(2, 40):
 
         I1 = gauss_quad(f=func1, a=8, b=30, n=i)
         I2 = gauss_quad(f=func2, n=i)
         print(i, I1)
-        print(i, I2)
+        print(i, I2, abs(I2 - I) / I)

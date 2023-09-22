@@ -2,6 +2,7 @@ import numpy as np
 
 
 from la.linear_algebra import *
+from la.linalg import *
 
 
 
@@ -101,3 +102,19 @@ if __name__ == "__main__":
 
     print(is_diagonal_dominant(a), is_diagonal_dominant(b))
 
+    a = [[2, 5, 8, 7], [5, 2, 2, 8], [7, 5, 6, 6], [5, 4, 4, 8]]
+
+    mat_pow = np.linalg.matrix_power(a, 5)
+    for pi in mat_pow:
+        print(pi)
+
+    p, l, u = lup(a)
+    for pi in p:
+        print(pi)
+    print('L')
+    for li in l:
+        print([round(lij, 4) for lij in li])
+    print('U')
+    for ui in u:
+        print([round(uij, 4) for uij in ui])
+    print()

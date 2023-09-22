@@ -138,8 +138,7 @@ def lup(A, permute_l = False):
         L = mat_mul(A, inverse(U))
     else:
         L = mat_mul(mat_mul(inverse(P), A), inverse(U))
-
-    return (P, L, U)
+        return (P, L, U)
 
 
 def forward_sub(L, b):
@@ -163,10 +162,9 @@ def back_sub(U, b):
 
     for i in range(n - 1, -1, -1):
         tmp = b[i]
-        print(tmp)
         for j in range(i + 1, n):
             tmp -= U[i][j] * x[j]
-    x[i] = tmp / U[i][i]
+        x[i] = tmp / U[i][i]
 
     return x
 
