@@ -60,3 +60,5 @@ if __name__ == "__main__":
     x = newton_raphson([f1, f2, f3])
     print(f1(*x), f2(*x), f3(*x))
     print(x)
+    x = newton_raphson([f1])
+    print(x)

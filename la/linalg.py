@@ -423,3 +423,79 @@ def newton_raphson2(f: callable, x0: float = None, args: list = [], tol: float =
         return xnew
     else:
         return newton_raphson2(f, xnew, args, tol, w, it  + 1)
+
+
+def fsolve(func:callable, x0:list, args=(), dx:float=None, jac:callable=None, rtol:float=1e-6, max_iter:int=100, w:float=None) -> list[float]:
+    
+    '''
+        Find roots of a function.
+        Returns the roots of the (non-linear) equations defined by func(x) = 0 given a statring
+        estimate
+        ---------------------------------------------------------------------------------------
+        Parameters:     
+        -----------
+                        func : callable f(x, *args)
+                            A function that takes at least one argument, and returns a value 
+                            of the same length
+                        x0 : array_like, optional
+                            The starting estimate for the roots of func(x) = 0.
+                            If None will be set to 1.0 for all x
+                        args : tuple, optional
+                            Any extra arguments to func
+                        dx : array_like, optional
+                            Step size array. If None will be set to 1e-6 for each x
+                        jac : callable, optional
+                            Function to compute Jacobian matrix. If None will be estimated
+                        rtol : float, optional
+                            The calculation will terminate if the relative error between two
+                            consecutive iterates is at most rtol. Default 1e-6
+                        max_iter : integer, optional
+                            Maximum number of iterations. Default 800
+                        w : array_like, optional
+                            Damping factor. If None estimated solution will not be damped
+        Returns:        
+        --------
+                        x : array_like
+                            The solution (or the result of last iteration for an unsuccessful call)
+    '''
+
+    
+    n = len(x0)
+
+    def jacobian_matrix(func, x, dx, args=()):
+        jac = [[0.0 for j in range(n)] for i in range(n)]
+        
+        for i in range(n):
+            for j in range(n):
+                x1 = [x[k] if k != j else x[k] + dx[k] for k in range(n)]
+                x2 = [x[k] if k != j else x[k] - dx[k] for k in range(n)]
+                jac[i][j] = (func(x1, *args)[i] - func(x2, *args)[i]) / dx[j]
+        return jac
+
+    if not dx: dx = [1e-6 for i in range(n)]
+
+    for i in range(max_iter):
+
+        if not jac:
+            jacobian = jacobian_matrix(func, x0, dx, args)
+        else:
+            jacobian = jac(x0, *args)
+        
+        fs = func(x0, *args)
+        jacobian = inverse(jacobian)
+        
+        if not w:
+            delx = mat_mul(mat_mul(-1, jacobian), fs)
+        else:
+            delx = mat_mul(mat_mul(mat_mul(-1, jacobian), fs), w)
+        
+        xn = mat_add(x0, delx)
+        es = norm([(f0 - fn) ** 2 for f0, fn in zip(fs, func(xn, *args))]) / norm(fs)
+
+        if abs(es) <= rtol:
+            return xn
+        else:
+            x0 = xn
+
+    print('Maximum iterration exceded. No solutions found')
+    return xn

@@ -16,7 +16,7 @@ DIR = os.path.abspath(os.path.join(
 ))
 sys.path.append(DIR)
 
-from ode.euler import *
+from de.ode import *
 
 
 '''
