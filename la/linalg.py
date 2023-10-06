@@ -192,7 +192,7 @@ def solveLU(a, b):
     return x
 
 
-def solveLUP(A, b):
+def solveLUP(A, b, tridiagonal=False):
 
     '''
         Solving system of equations with partial pivoting
@@ -200,6 +200,23 @@ def solveLUP(A, b):
         => [P][L]{y} = {b}, [L]{y} = {b}(inverse([P])),
         where {y} = [U]{x} => {x} = {y}(inverse([U]))
     '''
+
+    if tridiagonal:
+        bm = [A[i][i] for i in range(n) for j in range(n) if i == j]
+        am = [A[i+1][i] for i in range(n - 1) for j in range(n) if i == j]
+        cm = [A[i][i+1] for i in range(n) for j in range(n - 1) if i == j]
+        dm = deepcopy(b)
+        x = zeros(n)
+
+        for i in range(n - 1):
+            w = am[i] / bm[i]
+            bm[i + 1] -= w * cm[i]
+            dm[i + 1] -= w * dm[i]
+        x[n - 1] = dm[n - 1] / bm[n - 1]
+        for i in range(n - 2, -1, -1):
+            x[i] = (dm[i] - cm[i] * x[i + 1]) / bm[i]
+        
+        return x
 
     n = len(A)
     y = [0.0 for i in range(n)]

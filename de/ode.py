@@ -9,7 +9,7 @@ DIR = os.path.abspath(os.path.join(
 ))
 sys.path.append(DIR)
 
-from la.linalg import newton_raphson2
+from la.linalg import solveLUP
 
 
 
@@ -222,6 +222,7 @@ def solve_ipv(fun, tspan, ic, method='RK45', teval=None, args=()):
     
     for t in range(len(teval) - 1):
         h = teval[t + 1] - teval[t]
+        print(f'{h = }')
         k1 = [f(tf, yf, fun, *args)] if n == 0 else f(tf, yf, fun, *args)
         k2 = [f(tf + h / 2, [yfi + h * k1i / 2 for yfi, k1i in zip(yf, k1)], fun, *args)] if n == 0 \
             else f(tf + h / 2, [yfi + h * k1i / 2 for yfi, k1i in zip(yf, k1)], fun, *args)
@@ -246,3 +247,66 @@ def solve_ipv(fun, tspan, ic, method='RK45', teval=None, args=()):
         ysol = [yi[0] for yi in ysol]
 
     return tsol, ysol
+
+
+def solve_bvp(fun, bc, x, y, it=10):
+
+    def poly(c, x):
+        return sum([c[i] * x ** i for i in range(len(c) - 1)])
+
+    def polyder(c, x):
+        return sum([c[i] * i * x ** (i - 1) for i in range(1, len(c) - 1)])
+
+    max_it = it
+    if max_it == 0:
+        print('Maximum number of iterations exeeded')
+        return None
+
+    n = len(x)
+    ysol = []
+    xsol = []
+    y = np.asarray(y)
+    x = np.asarray(x)
+    xa = x[0]
+    xb = x[-1]
+    c = [0, 0.5, 0.5, 1]
+
+    S = []
+    Sp = []
+    q = []
+
+    for i in range(n - 1):
+        h = x[i + 1] - x[i]
+        k1 = fun(x[i] + c[0] * h, y[:, i] + c[0] * h)
+        k2 = fun(x[i] + c[1] * h, y[:, i] + c[1] * h * k1)
+        k3 = fun(x[i] + c[2] * h, y[:, i] + c[2] * h * k2)
+        k4 = fun(x[i] + c[3] * h, y[:, i] + c[3] * h * k3)
+
+        k = len(k1)
+        xs = np.array([x[i], x[i] + 0.5 * h, x[i] + h])
+        ys = np.array([y[: ,i], (y[:, i] + c[1] * h * k1 + y[:, i] + c[2] * h * k2) / 2, y[:, i] + c[3] * h])
+        A = [
+            [xs[k] ** j for j in range(3)] for k in range(3)
+        ]
+        q.append([solveLUP(A, ys[:, j]) for j in range(k)])
+        S.append([poly(q[i][j], x[i]) for j in range(k)])
+        Sp.append([polyder(q[i][j], x[i]) for j in range(k)])
+
+        ysol.append(y[:, i] + (h / 6) * k1 + 2 * k2 + 2 * k3 + k4)
+        xsol.append(x[i])
+   
+    S.append([poly(q[-1][j], xb) for j in range(2)])
+    Sp.append([polyder(q[-1][j], xb) for j in range(2)])
+
+    ya = S[0]
+    yb = S[-1]
+    print('BC control')
+    print(ya, yb, bc(ya, yb))
+    bcn = bc(ya, yb)
+    if (abs(bcn[0]) <= 1e-6 and abs(bcn[1]) <= 1e-6):
+        return S
+    else:
+        print('Solution')
+        yn = (np.array([si - fun(x[i], si) for si in Sp])).transpose()
+        print(yn)
+        return solve_bvp(fun, bc, x, yn, it=max_it-1)
